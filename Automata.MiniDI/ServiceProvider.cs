@@ -38,7 +38,7 @@ namespace Automata.MiniDI
 
                 if (serviceDescriptor.ImplementationInstance == null || serviceDescriptor.Lifetime == ServiceLifetime.Transient)
                 {
-                    serviceInstance = ActivatorUtilities.CreateInstance(serviceDescriptor.ImplementationType);
+                    serviceInstance = ActivatorUtilities.CreateInstance(this, serviceDescriptor.ImplementationType);
                 }
                 else
                 {
