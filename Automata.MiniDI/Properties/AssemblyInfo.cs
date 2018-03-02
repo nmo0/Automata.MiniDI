@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("NIRE.Flow.DependencyInjection")]
+[assembly: AssemblyTitle("Automata.MiniDI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("NIRE.Flow.DependencyInjection")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2018")]
+[assembly: AssemblyCompany("VISTEN")]
+[assembly: AssemblyProduct("Automata.MiniDI")]
+[assembly: AssemblyCopyright("Copyright © VISTEN 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
