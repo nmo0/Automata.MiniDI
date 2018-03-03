@@ -7,13 +7,13 @@ namespace Automata.MiniDI
 {
     public class ServiceDescriptor
     {
-        public ServiceLifetime Lifetime { get; }
+        public ServiceLifetime Lifetime { get; set; }
 
-        public Type ServiceType { get; }
+        public Type ServiceType { get; set; }
 
-        public Type ImplementationType { get; }
+        public Type ImplementationType { get; set; }
 
-        public object ImplementationInstance { get; }
+        public object ImplementationInstance { get; set; }
         
 
         public ServiceDescriptor(

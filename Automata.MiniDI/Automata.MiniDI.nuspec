@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Automata.MiniDI</id>
+    <version>$version$</version>
+    <title>Automata Mini Dependency Injection</title>
+    <authors>visten</authors>
+    <owners>visten</owners>
+    <projectUrl>https://github.com/visten/Automata.MiniDI</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Automata Mini Dependency Injection</description>
+    <releaseNotes></releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>DI Automata Dependency Injection</tags>
+  </metadata>
+</package>
