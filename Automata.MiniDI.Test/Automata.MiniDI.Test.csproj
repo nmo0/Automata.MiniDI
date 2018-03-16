@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Services\BusinessService.cs" />
     <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\GenericService.cs" />
     <Compile Include="Services\MyService.cs" />
     <Compile Include="Services\MyService2.cs" />
     <Compile Include="Services\OtherService.cs" />

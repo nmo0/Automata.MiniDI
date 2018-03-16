@@ -9,10 +9,19 @@ namespace Automata.MiniDI
     {
         public ServiceLifetime Lifetime { get; set; }
 
+        /// <summary>
+        /// 类型(包含接口)
+        /// </summary>
         public Type ServiceType { get; set; }
 
+        /// <summary>
+        /// 实现类型
+        /// </summary>
         public Type ImplementationType { get; set; }
 
+        /// <summary>
+        /// 实例
+        /// </summary>
         public object ImplementationInstance { get; set; }
         
 

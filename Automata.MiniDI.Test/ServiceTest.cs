@@ -72,5 +72,45 @@ namespace Automata.MiniDI.Test
         }
 
 
+        ///// <summary>
+        ///// 没有指定实现类型也能查找到依赖
+        ///// </summary>
+        //[TestMethod]
+        //public void GetServiceWithNoImplementation()
+        //{
+        //    //var services = new ServiceCollection();
+
+        //    //services.AddSingleton<IFileService, FileService>();
+        //    //services.AddSingleton<OtherService>();
+        //    //services.AddTransient<IMyService, MyService>();
+        //    //services.AddTransient<IMyService2, MyService2>();
+
+        //    //var provider = services.BuildServiceProvider();
+        //}
+
+        /// <summary>
+        /// 查找泛型依赖 & 没有指定实现类型也能查找到依赖
+        /// </summary>
+        [TestMethod]
+        public void GetServiceWithGeneric()
+        {
+            var instance = GetServiceWithGeneric<IGenericService<Model1>>();
+
+            Assert.IsNotNull(instance);
+            Assert.AreEqual(instance.GetName(), "Service1");
+        }
+
+        private T GetServiceWithGeneric<T>()
+        {
+            var services = new ServiceCollection();
+
+            services.AddSingleton<IGenericService<Model1>>();
+            services.AddSingleton<IGenericService<Model2>>();
+
+            var provider = services.BuildServiceProvider();
+
+            return (T)provider.GetService<T>();
+        }
+
     }
 }

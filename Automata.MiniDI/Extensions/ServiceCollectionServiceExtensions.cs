@@ -12,7 +12,14 @@ namespace Automata.MiniDI.Extensions
             this IServiceCollection services,
             Type serviceType)
         {
-            return services.AddTransient(serviceType, serviceType);
+            Type implementationType = null;
+
+            if (!serviceType.IsInterface)
+            {
+                implementationType = serviceType;
+            }
+
+            return services.AddTransient(serviceType, implementationType);
         }
 
         public static IServiceCollection AddTransient(
@@ -48,7 +55,15 @@ namespace Automata.MiniDI.Extensions
             Type serviceType,
             object implementationInstance)
         {
-            return services.AddSingleton(serviceType, serviceType, implementationInstance);
+            return services.AddSingleton(serviceType, null, implementationInstance);
+        }
+
+        public static IServiceCollection AddSingleton(
+            this IServiceCollection services,
+            Type serviceType,
+            Type implementationType)
+        {
+            return Add(services, serviceType, implementationType, null, ServiceLifetime.Singleton);
         }
 
         public static IServiceCollection AddSingleton(
@@ -63,7 +78,14 @@ namespace Automata.MiniDI.Extensions
         public static IServiceCollection AddSingleton<TService>(
             this IServiceCollection services)
         {
-            return services.AddSingleton(typeof(TService), null);
+            Type implementationType = null;
+
+            if (!typeof(TService).IsInterface)
+            {
+                implementationType = typeof(TService);
+            }
+
+            return services.AddSingleton(typeof(TService), implementationType);
         }
 
         public static IServiceCollection AddSingleton<TService, TImplementation>(

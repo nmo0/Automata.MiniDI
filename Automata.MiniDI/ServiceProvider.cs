@@ -30,30 +30,33 @@ namespace Automata.MiniDI
 
         private object CreateInstance(Type serviceType)
         {
-            if (_serviceDescriptors.Any(m => serviceType.IsAssignableFrom(m.ImplementationType)))
+            ServiceDescriptor serviceDescriptor = null;
+            if (!serviceType.IsInterface && _serviceDescriptors.Any(m => serviceType.IsAssignableFrom(m.ImplementationType)))
             {
-                var serviceDescriptor = _serviceDescriptors.First(m => serviceType.IsAssignableFrom(m.ImplementationType));
-
-                object serviceInstance = null;
-
-                if (serviceDescriptor.ImplementationInstance == null || serviceDescriptor.Lifetime == ServiceLifetime.Transient)
-                {
-                    serviceInstance = ActivatorUtilities.CreateInstance(this, serviceDescriptor.ImplementationType);
-                }
-                else
-                {
-                    serviceInstance = serviceDescriptor.ImplementationInstance;
-                }
-
-                if (serviceDescriptor.Lifetime == ServiceLifetime.Singleton)
-                {
-                    _cache.Add(serviceType, serviceInstance);
-                }
-
-                return serviceInstance;
+                serviceDescriptor = _serviceDescriptors.First(m => serviceType.IsAssignableFrom(m.ImplementationType));
+            }
+            else if (serviceType.IsInterface)
+            {
+                serviceDescriptor = _serviceDescriptors.First(m => serviceType.FullName.Equals(m.ServiceType.FullName));
             }
 
-            return null;
+            object serviceInstance = null;
+
+            if (serviceDescriptor.ImplementationInstance == null || serviceDescriptor.Lifetime == ServiceLifetime.Transient)
+            {
+                serviceInstance = ActivatorUtilities.CreateInstance(this, serviceDescriptor.ServiceType, serviceDescriptor.ImplementationType);
+            }
+            else
+            {
+                serviceInstance = serviceDescriptor.ImplementationInstance;
+            }
+
+            if (serviceDescriptor.Lifetime == ServiceLifetime.Singleton)
+            {
+                _cache.Add(serviceType, serviceInstance);
+            }
+
+            return serviceInstance;
 
             //throw new Exception(nameof(serviceType) + " 不存在");
         }

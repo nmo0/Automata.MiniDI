@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Automata.MiniDI
@@ -13,10 +14,65 @@ namespace Automata.MiniDI
             return instance;
         }
 
-        public static object CreateInstance(IServiceProvider serviceProvider, Type type, params object[] args)
+        private static IList<Type> ScanType(Type interfaceType)
         {
-            var constructors = type.GetConstructors().OrderBy(m=>m.GetParameters().Length);
+            var result = new List<Type>();
+            var dll = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", System.IO.SearchOption.AllDirectories);
+            var exe = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.exe", System.IO.SearchOption.AllDirectories);
 
+            var allFile = dll.ToList();
+            allFile.AddRange(exe.ToArray());
+
+            foreach (var item in allFile)
+            {
+                result.AddRange(ScanType(interfaceType, item));
+            }
+
+            return result;
+        }
+
+        private static IList<Type> ScanType(Type interfaceType, string filePath)
+        {
+            var result = new List<Type>();
+
+            Assembly assembly = Assembly.LoadFile(filePath);
+
+            foreach (var item in assembly.GetTypes())
+            {
+                if (interfaceType.IsAssignableFrom(item))
+                {
+                    result.Add(item);
+                }
+            }
+
+            return result;
+        } 
+
+        private static Type FindImplementationType(Type interfaceType)
+        {
+            var implementationType = ScanType(interfaceType);
+
+            if (implementationType.Count == 0)
+            {
+                throw new Exception(string.Format("Can`t Find Implementation Of {0}", interfaceType.FullName));
+            }
+
+            if (implementationType.Count > 1)
+            {
+                throw new Exception(string.Format("Found multiple implementations of the interface {0}", interfaceType.FullName));
+            }
+
+            return implementationType.Single();
+        }
+
+        public static object CreateInstance(IServiceProvider serviceProvider, Type type, Type implementationType, params object[] args)
+        {
+            if (type.IsInterface && implementationType == null)
+            {
+                implementationType = FindImplementationType(type);
+            }
+
+            var constructors = implementationType.GetConstructors().OrderBy(m=>m.GetParameters().Length);
 
             foreach (var item in constructors)
             {
@@ -52,12 +108,12 @@ namespace Automata.MiniDI
 
                 if (flag)
                 {
-                    var instance = CreateInstance(type, ctorArgs);
+                    var instance = CreateInstance(implementationType, ctorArgs);
                     return instance;
                 }
             }
 
-            throw new MissingMethodException("创建" + type.Name + "失败，因为没有找到合适的构造函数参数");
+            throw new MissingMethodException("创建" + implementationType.Name + "失败，因为没有找到合适的构造函数参数");
         }
     }
 }
