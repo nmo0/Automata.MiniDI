@@ -17,11 +17,35 @@ namespace Automata.MiniDI
         private static IList<Type> ScanType(Type interfaceType)
         {
             var result = new List<Type>();
-            var dll = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", System.IO.SearchOption.AllDirectories);
-            var exe = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.exe", System.IO.SearchOption.AllDirectories);
 
-            var allFile = dll.ToList();
-            allFile.AddRange(exe.ToArray());
+            var allFile = new List<string>();
+
+            var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            if (System.Threading.Thread.GetDomain().FriendlyName.IndexOf("W3SVC") > -1)
+            {
+                var theAssemblyPath = Assembly.GetExecutingAssembly().Location;
+
+                var key = "assembly";
+
+                currentDirectory = theAssemblyPath.Substring(0, theAssemblyPath.LastIndexOf(key) + key.Length);
+
+                var dll = System.IO.Directory.GetFiles(currentDirectory, "*.dll", System.IO.SearchOption.AllDirectories);
+                var exe = System.IO.Directory.GetFiles(currentDirectory, "*.exe", System.IO.SearchOption.AllDirectories);
+
+                allFile = dll.ToList();
+                allFile.AddRange(exe.ToArray());
+
+                //currentDirectory = System.IO.Path.Combine(currentDirectory, "bin");
+            }
+            else
+            {
+                var dll = System.IO.Directory.GetFiles(currentDirectory, "*.dll");
+                var exe = System.IO.Directory.GetFiles(currentDirectory, "*.exe");
+
+                allFile = dll.ToList();
+                allFile.AddRange(exe.ToArray());
+            }
 
             foreach (var item in allFile)
             {
@@ -37,8 +61,20 @@ namespace Automata.MiniDI
 
             Assembly assembly = Assembly.LoadFile(filePath);
 
+            //忽略系统程序集
+            if (System.Text.RegularExpressions.Regex.IsMatch(assembly.FullName, @"^System."))
+            {
+                return result;
+            }
+
             foreach (var item in assembly.GetTypes())
             {
+                //if (interfaceType.IsAssignableFrom(item) ||
+                //    Array.Exists(item.GetInterfaces(), t => interfaceType.FullName.Equals(t.FullName)) ||
+                //    Array.Exists(item.GetInterfaces(), t => t.IsGenericType && t.GetGenericTypeDefinition() == interfaceType))
+                //{
+                //    result.Add(item);
+                //}
                 if (interfaceType.IsAssignableFrom(item))
                 {
                     result.Add(item);
@@ -46,7 +82,7 @@ namespace Automata.MiniDI
             }
 
             return result;
-        } 
+        }
 
         private static Type FindImplementationType(Type interfaceType)
         {

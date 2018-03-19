@@ -109,7 +109,28 @@ namespace Automata.MiniDI.Test
 
             var provider = services.BuildServiceProvider();
 
-            return (T)provider.GetService<T>();
+            return provider.GetService<T>();
+        }
+
+        [TestMethod]
+        public void GetServiceWithMultiGeneric()
+        {
+            var instance = GetServiceWithMultiGeneric<Model1, Model2>();
+
+            Assert.IsNotNull(instance);
+            Assert.AreEqual(instance.GetName(), "Multi Service2");
+        }
+
+        private IMultiGenericService<T1, T2> GetServiceWithMultiGeneric<T1, T2>()
+        {
+            var services = new ServiceCollection();
+
+            services.AddSingleton<IMultiGenericService<Model1, Model2>>();
+            services.AddSingleton<IMultiGenericService<Model3, Model4>>();
+
+            var provider = services.BuildServiceProvider();
+
+            return provider.GetService<IMultiGenericService<T1, T2>>();
         }
 
     }
