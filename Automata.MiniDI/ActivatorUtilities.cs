@@ -14,6 +14,36 @@ namespace Automata.MiniDI
             return instance;
         }
 
+        public static Assembly GetAssembly(string name)
+        {
+            var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            IEnumerable<string> dll = null;
+
+            if (System.Threading.Thread.GetDomain().FriendlyName.IndexOf("W3SVC") > -1)
+            {
+                var theAssemblyPath = Assembly.GetExecutingAssembly().Location;
+
+                var key = "assembly";
+
+                currentDirectory = theAssemblyPath.Substring(0, theAssemblyPath.LastIndexOf(key) + key.Length);
+
+                dll = System.IO.Directory.GetFiles(currentDirectory, name, System.IO.SearchOption.AllDirectories).ToList();
+            }
+            else
+            {
+                dll = System.IO.Directory.GetFiles(currentDirectory, name).ToList();
+            }
+
+            var file = dll.FirstOrDefault();
+            if (file != null)
+            {
+                return Assembly.LoadFile(file);
+            }
+
+            return null;
+        }
+
         private static IList<Type> ScanType(Type interfaceType)
         {
             var result = new List<Type>();
