@@ -8,5 +8,7 @@ namespace Automata.MiniDI.Interface
     public interface IServiceProvider
     {
         object GetService(Type serviceType);
+
+        T GetService<T>(Func<T, bool> filter) where T : class;
     }
 }

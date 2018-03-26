@@ -14,6 +14,36 @@ namespace Automata.MiniDI
             return instance;
         }
 
+        /// <summary>
+        /// 查找所有的引用
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAssemblyPaths()
+        {
+            var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            var name = "*.dll";
+
+            string[] dll = null;
+
+            if (System.Threading.Thread.GetDomain().FriendlyName.IndexOf("W3SVC") > -1)
+            {
+                var theAssemblyPath = Assembly.GetExecutingAssembly().Location;
+
+                var key = "assembly";
+
+                currentDirectory = theAssemblyPath.Substring(0, theAssemblyPath.LastIndexOf(key) + key.Length);
+
+                dll = System.IO.Directory.GetFiles(currentDirectory, name, System.IO.SearchOption.AllDirectories);
+            }
+            else
+            {
+                dll = System.IO.Directory.GetFiles(currentDirectory, name);
+            }
+
+            return dll;
+        }
+
         public static Assembly GetAssembly(string name)
         {
             var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -131,7 +161,7 @@ namespace Automata.MiniDI
             return implementationType.Single();
         }
 
-        public static object CreateInstance(IServiceProvider serviceProvider, Type type, Type implementationType, params object[] args)
+        public static object CreateInstance(Interface.IServiceProvider serviceProvider, Type type, Type implementationType, params object[] args)
         {
             if (type.IsInterface && implementationType == null)
             {
@@ -180,6 +210,22 @@ namespace Automata.MiniDI
             }
 
             throw new MissingMethodException("创建" + implementationType.Name + "失败，因为没有找到合适的构造函数参数");
+        }
+
+        public static object Invoke(Type type, string method, object instance, Type[] genericType, object[] param, bool isStatic)
+        {
+            MethodInfo methodInfo = null;
+
+            if (genericType != null && genericType.Length > 0)
+            {
+                methodInfo = type.GetMethod(method).MakeGenericMethod(genericType);
+            }
+            else
+            {
+                methodInfo = type.GetMethod(method);
+            }
+
+            return methodInfo.Invoke(null, param);
         }
     }
 }

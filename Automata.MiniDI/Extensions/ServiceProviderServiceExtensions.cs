@@ -7,7 +7,7 @@ namespace Automata.MiniDI.Extensions
 {
     public static class ServiceProviderServiceExtensions
     {
-        public static T GetService<T>(this IServiceProvider provider)
+        public static T GetService<T>(this Interface.IServiceProvider provider)
         {
             return (T)provider.GetService(typeof(T));
         }
