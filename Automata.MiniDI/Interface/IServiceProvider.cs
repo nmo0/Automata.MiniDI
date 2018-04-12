@@ -10,5 +10,7 @@ namespace Automata.MiniDI.Interface
         object GetService(Type serviceType);
 
         T GetService<T>(Func<T, bool> filter) where T : class;
+
+        object GetService(Func<ServiceDescriptor, bool> filter);
     }
 }
