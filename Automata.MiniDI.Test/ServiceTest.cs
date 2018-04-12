@@ -133,5 +133,31 @@ namespace Automata.MiniDI.Test
             return provider.GetService<IMultiGenericService<T1, T2>>();
         }
 
+
+        [TestMethod]
+        public void 查询多接口类()
+        {
+            var services = new ServiceCollection();
+
+            services.AddSingleton<IMyServiceBase, MyServiceBase>();
+            services.AddSingleton<IMyService3, MyService3>();
+            services.AddSingleton<IMyService4, MyService4>();
+
+            var provider = services.BuildServiceProvider();
+
+            var service = (IMyServiceBase)provider.GetService(descriptor => {
+                if (typeof(IMyServiceBase).IsAssignableFrom(descriptor.ServiceType))
+                {
+                    var _service = (IMyServiceBase)provider.GetService(descriptor.ImplementationType);
+                    if ("MyService4".Equals(_service.key))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            Assert.AreEqual(service.key, "MyService4");
+        }
     }
 }

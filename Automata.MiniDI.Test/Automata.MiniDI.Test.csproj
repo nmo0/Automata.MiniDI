@@ -56,6 +56,7 @@
     <Compile Include="Services\GenericService.cs" />
     <Compile Include="Services\MyService.cs" />
     <Compile Include="Services\MyService2.cs" />
+    <Compile Include="Services\MyService3.cs" />
     <Compile Include="Services\OtherService.cs" />
     <Compile Include="ServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

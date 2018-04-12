@@ -34,6 +34,25 @@ namespace Automata.MiniDI
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
         /// <returns></returns>
+        public object GetService(Func<ServiceDescriptor, bool> filter)
+        {
+            foreach (var item in _serviceDescriptors)
+            {
+                if (filter(item))
+                {
+                    return GetService(item.ImplementationType);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 根据过滤器查找依赖项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public T GetService<T>(Func<T, bool> filter) where T : class
         {
             var serviceType = typeof(T);
@@ -50,7 +69,6 @@ namespace Automata.MiniDI
                     }
                 }
             }
-
             return null;
         }
 
