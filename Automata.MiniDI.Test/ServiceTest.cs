@@ -157,6 +157,8 @@ namespace Automata.MiniDI.Test
                 return false;
             });
 
+            var service2 = provider.GetService<IMyServiceBase>();
+
             Assert.AreEqual(service.key, "MyService4");
         }
     }

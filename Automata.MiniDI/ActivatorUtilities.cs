@@ -215,14 +215,21 @@ namespace Automata.MiniDI
         public static object Invoke(Type type, string method, object instance, Type[] genericType, object[] param, bool isStatic)
         {
             MethodInfo methodInfo = null;
+            
+            Type[] types = new Type[param.Length];
+
+            for (int i = 0; i < param.Length; i++)
+            {
+                types[i] = param[i].GetType();
+            }
 
             if (genericType != null && genericType.Length > 0)
             {
-                methodInfo = type.GetMethod(method).MakeGenericMethod(genericType);
+                methodInfo = type.GetMethod(method, types).MakeGenericMethod(genericType);
             }
             else
             {
-                methodInfo = type.GetMethod(method);
+                methodInfo = type.GetMethod(method, types);
             }
 
             return methodInfo.Invoke(null, param);
