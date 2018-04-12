@@ -212,7 +212,7 @@ namespace Automata.MiniDI
             throw new MissingMethodException("创建" + implementationType.Name + "失败，因为没有找到合适的构造函数参数");
         }
 
-        public static object Invoke(Type type, string method, object instance, Type[] genericType, object[] param, bool isStatic)
+        public static object Invoke(Type type, string method, object instance, Type[] genericType, object[] param)
         {
             MethodInfo methodInfo = null;
             
@@ -232,7 +232,7 @@ namespace Automata.MiniDI
                 methodInfo = type.GetMethod(method, types);
             }
 
-            return methodInfo.Invoke(null, param);
+            return methodInfo.Invoke(instance, param);
         }
     }
 }
