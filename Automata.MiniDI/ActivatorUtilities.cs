@@ -18,6 +18,7 @@ namespace Automata.MiniDI
         /// 查找所有的引用
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         public static IEnumerable<string> GetAssemblyPaths()
         {
             var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -44,6 +45,46 @@ namespace Automata.MiniDI
             return dll;
         }
 
+        /// <summary>
+        /// 从当前线程的AppDomain获取所有Assembly的物理dll路径
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAssemblyPathFromAppDomain()
+        {
+            return GetAssemblyPathFromAppDomain(AppDomain.CurrentDomain);
+        }
+
+        /// <summary>
+        /// 从指定AppDomain获取所有Assembly的物理dll路径
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAssemblyPathFromAppDomain(AppDomain appDomain)
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var result = new List<string>();
+            foreach (var item in assemblies)
+            {
+                try
+                {
+                    if (!item.IsDynamic)
+                    {
+                        result.Add(item.Location);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 根据DLL名称获取Assembly
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [Obsolete]
         public static Assembly GetAssembly(string name)
         {
             var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -74,6 +115,41 @@ namespace Automata.MiniDI
             return null;
         }
 
+        /// <summary>
+        /// 从指定AppDomain获取指定dll名称(ScopeName)的Assembly
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="appDomain"></param>
+        /// <returns></returns>
+        public static Assembly GetAssemblyFromAppDomain(string name, AppDomain appDomain)
+        {
+            var assemblys = appDomain.GetAssemblies();
+            foreach (var assembly in assemblys)
+            {
+                if (!assembly.IsDynamic && name.Equals(assembly.ManifestModule.ScopeName))
+                {
+                    return assembly;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 从当前线程的AppDomain获取指定dll名称(ScopeName)的Assembly
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Assembly GetAssemblyFromAppDomain(string name)
+        {
+            return GetAssemblyFromAppDomain(name, AppDomain.CurrentDomain);
+        }
+
+        /// <summary>
+        /// 根据接口类查找实现
+        /// </summary>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        [Obsolete]
         private static IList<Type> ScanType(Type interfaceType)
         {
             var result = new List<Type>();
@@ -115,6 +191,37 @@ namespace Automata.MiniDI
             return result;
         }
 
+        private static IList<Type> ScanTypeFromAppDomain(Type interfaceType)
+        {
+            return ScanTypeFromAppDomain(interfaceType, AppDomain.CurrentDomain);
+        }
+
+        private static IList<Type> ScanTypeFromAppDomain(Type interfaceType, AppDomain appDomain)
+        {
+            var result = new List<Type>();
+            var assemblies = appDomain.GetAssemblies();
+
+            foreach (var assembly in assemblies)
+            {
+                foreach (var item in assembly.GetTypes())
+                {
+                    if (interfaceType.IsAssignableFrom(item))
+                    {
+                        result.Add(item);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 根据接口类查找实现
+        /// </summary>
+        /// <param name="interfaceType"></param>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        [Obsolete]
         private static IList<Type> ScanType(Type interfaceType, string filePath)
         {
             var result = new List<Type>();
@@ -146,7 +253,7 @@ namespace Automata.MiniDI
 
         private static Type FindImplementationType(Type interfaceType)
         {
-            var implementationType = ScanType(interfaceType);
+            var implementationType = ScanTypeFromAppDomain(interfaceType);
 
             if (implementationType.Count == 0)
             {
@@ -161,6 +268,14 @@ namespace Automata.MiniDI
             return implementationType.Single();
         }
 
+        /// <summary>
+        /// 根据指定类型/接口类型 创建实例
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="type"></param>
+        /// <param name="implementationType"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static object CreateInstance(Interface.IServiceProvider serviceProvider, Type type, Type implementationType, params object[] args)
         {
             if (type.IsInterface && implementationType == null)
@@ -212,6 +327,15 @@ namespace Automata.MiniDI
             throw new MissingMethodException("创建" + implementationType.Name + "失败，因为没有找到合适的构造函数参数");
         }
 
+        /// <summary>
+        /// 根据方法名称调用指定类型的指定方法
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="method">方法名</param>
+        /// <param name="instance">实例（如果是静态类则为null）</param>
+        /// <param name="genericType">泛型类型</param>
+        /// <param name="param">参数</param>
+        /// <returns></returns>
         public static object Invoke(Type type, string method, object instance, Type[] genericType, object[] param)
         {
             MethodInfo methodInfo = null;
