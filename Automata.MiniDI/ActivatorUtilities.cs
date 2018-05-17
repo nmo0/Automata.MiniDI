@@ -191,12 +191,23 @@ namespace Automata.MiniDI
             return result;
         }
 
-        private static IList<Type> ScanTypeFromAppDomain(Type interfaceType)
+        /// <summary>
+        /// 根据指定接口类型从当前线程的应用程序域查找所有的实现类型
+        /// </summary>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        public static IList<Type> ScanTypeFromAppDomain(Type interfaceType)
         {
             return ScanTypeFromAppDomain(interfaceType, AppDomain.CurrentDomain);
         }
 
-        private static IList<Type> ScanTypeFromAppDomain(Type interfaceType, AppDomain appDomain)
+        /// <summary>
+        /// 根据指定接口类型从指定的应用程序域查找所有的实现类型
+        /// </summary>
+        /// <param name="interfaceType"></param>
+        /// <param name="appDomain"></param>
+        /// <returns></returns>
+        public static IList<Type> ScanTypeFromAppDomain(Type interfaceType, AppDomain appDomain)
         {
             var result = new List<Type>();
             var assemblies = appDomain.GetAssemblies();
@@ -357,6 +368,28 @@ namespace Automata.MiniDI
             }
 
             return methodInfo.Invoke(instance, param);
+        }
+
+        /// <summary>
+        /// 查找所有标识指定的特性类的方法
+        /// </summary>
+        /// <param name="targetType"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
+        public static IEnumerable<MethodInfo> FindMethodByAttribute(Type targetType, Type attributeType)
+        {
+            var result = new List<MethodInfo>();
+            var methods = targetType.GetMethods(BindingFlags.Public);
+            foreach (var method in methods)
+            {
+                var attribute = method.GetCustomAttribute(attributeType);
+                if (attribute != null)
+                {
+                    result.Add(method);
+                }
+            }
+
+            return result;
         }
     }
 }
