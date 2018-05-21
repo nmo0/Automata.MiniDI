@@ -50,6 +50,7 @@
     <Compile Include="ServiceCollection.cs" />
     <Compile Include="ServiceDescriptor.cs" />
     <Compile Include="ServiceLifetime.cs" />
+    <Compile Include="ServiceManager.cs" />
     <Compile Include="ServiceProvider.cs" />
     <Compile Include="Extensions\ServiceProviderServiceExtensions.cs" />
   </ItemGroup>
